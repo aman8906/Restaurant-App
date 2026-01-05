@@ -27,7 +27,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // NO SPACE
+    origin: "https://restaurant-app-eta-henna.vercel.app/", // NO SPACE
     credentials: true,
   })
 );
