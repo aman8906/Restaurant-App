@@ -122,6 +122,7 @@ const AppContextProvider = ({ children }) => {
     navigate,
     loading,
     setLoading,
+    isAuth,
     user,
     setUser,
     admin,
