@@ -1,5 +1,9 @@
+
+
 import React, { useState } from "react";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import emailjs from "@emailjs/browser";
+
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -19,26 +23,47 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = () => {
-    if (
-      formData.name &&
-      formData.email &&
-      formData.subject &&
-      formData.message
-    ) {
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          subject: "",
-          message: "",
-        });
-      }, 3000);
-    }
-  };
+  const handleSubmit = async () => {
+  if (
+    !formData.name ||
+    !formData.email ||
+    !formData.subject ||
+    !formData.message
+  ) {
+    return;
+  }
+
+  try {
+    await emailjs.send(
+      "service_5txu0p4",
+      "template_thwyazk",
+      {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+      },
+      "_xsHVIk1wjvpnkVN5"
+    );
+
+    setSubmitted(true);
+
+    setTimeout(() => {
+      setSubmitted(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+    }, 3000);
+  } catch (error) {
+    console.error("Email send failed:", error);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -231,4 +256,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default Contact;//added this ki jo information dala jaye o admin k email m information jaye
