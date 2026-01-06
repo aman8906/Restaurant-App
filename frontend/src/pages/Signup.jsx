@@ -17,31 +17,30 @@ const Signup = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
 
-      const { data } = await axios.post(
-        "/api/auth/register",
-        formData,
-        { withCredentials: true }
-      );
+    const { data } = await axios.post(
+      "/api/auth/register",
+      formData,
+      { withCredentials: true }
+    );
 
-     if (data.success) {
-  toast.success(data.message);
-  await isAuth();   // ✅ refresh auth state
-  navigate("/");
-}
-     else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Signup failed");
-    } finally {
-      setLoading(false);
+    if (data.success) {
+      toast.success(data.message);
+      navigate("/login"); // ✅ correct flow
+    } else {
+      toast.error(data.message);
     }
-  };
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Signup failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="py-12 flex items-center justify-center">
