@@ -28,10 +28,12 @@ const Signup = () => {
         { withCredentials: true }
       );
 
-      if (data.success) {
-        toast.success(data.message);
-        navigate("/");
-      } else {
+     if (data.success) {
+  toast.success(data.message);
+  await isAuth();   // ✅ refresh auth state
+  navigate("/");
+}
+     else {
         toast.error(data.message);
       }
     } catch (error) {
