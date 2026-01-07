@@ -7,20 +7,20 @@ export const AppContext = createContext();
 
 // ✅ Axios config
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
-axios.defaults.withCredentials = true; // important to send JWT cookies
+axios.defaults.withCredentials = true; 
 
 const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null); // logged-in user
-  const [admin, setAdmin] = useState(null); // admin if needed
+  const [user, setUser] = useState(null);
+  const [admin, setAdmin] = useState(null);
   const [categories, setCategories] = useState([]);
   const [menus, setMenus] = useState([]);
   const [cart, setCart] = useState({ items: [] });
   const [totalPrice, setTotalPrice] = useState(0);
 
-  // 🔹 Calculate total price whenever cart changes
+  // 🔹 Calculate total price
   useEffect(() => {
     if (cart?.items?.length > 0) {
       const total = cart.items.reduce(
@@ -33,10 +33,11 @@ const AppContextProvider = ({ children }) => {
     }
   }, [cart]);
 
-  // 🔹 Count total items in cart
-  const cartCount = cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+  // 🔹 Cart count
+  const cartCount =
+    cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
-  // 🔹 Fetch cart from backend
+  // 🔹 Fetch cart
   const fetchCartData = async () => {
     try {
       const { data } = await axios.get("/api/cart/get");
@@ -46,13 +47,17 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
-  // 🔹 Add item to cart
+  // 🔹 Add to cart
   const addToCart = async (menuId) => {
     try {
-      const { data } = await axios.post("/api/cart/add", { menuId, quantity: 1 });
+      const { data } = await axios.post("/api/cart/add", {
+        menuId,
+        quantity: 1,
+      });
+
       if (data.success) {
         toast.success(data.message);
-        fetchCartData(); // refresh cart
+        fetchCartData();
       } else {
         toast.error(data.message);
       }
@@ -67,7 +72,6 @@ const AppContextProvider = ({ children }) => {
     try {
       const { data } = await axios.get("/api/category/all");
       if (data.success) setCategories(data.categories);
-      else console.log("Failed to fetch categories");
     } catch (error) {
       console.log("Error fetching categories:", error);
     }
@@ -78,26 +82,33 @@ const AppContextProvider = ({ children }) => {
     try {
       const { data } = await axios.get("/api/menu/all");
       if (data.success) setMenus(data.menuItems);
-      else console.log("Failed to fetch menus");
     } catch (error) {
       console.log("Error fetching menus:", error);
     }
   };
 
-  // 🔹 Check if user is authenticated
+  // ✅ AUTH CHECK (FIXED AUTO LOGIN ISSUE)
   const isAuth = async () => {
     try {
+      const tokenExists = document.cookie.includes("token");
+
+      // 🚫 No token → don't auto login
+      if (!tokenExists) {
+        setUser(null);
+        setAdmin(null);
+        return;
+      }
+
       const { data } = await axios.get("/api/auth/is-auth");
+
       if (data.success) {
         setUser(data.user);
 
-        // ✅ Set admin if email matches admin email from env
         if (data.user.email === import.meta.env.VITE_ADMIN_EMAIL) {
           setAdmin(data.user);
         } else {
           setAdmin(null);
         }
-
       } else {
         setUser(null);
         setAdmin(null);
@@ -109,7 +120,7 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
-  // 🔹 Initial fetch
+  // 🔹 Initial Load
   useEffect(() => {
     isAuth();
     fetchCategories();
@@ -139,7 +150,11 @@ const AppContextProvider = ({ children }) => {
     addToCart,
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      {children}
+    </AppContext.Provider>
+  );
 };
 
 export default AppContextProvider;
