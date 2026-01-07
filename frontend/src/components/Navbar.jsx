@@ -1,34 +1,19 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { Link } from "react-router-dom";
-import {
-  Calendar,
-  LogOut,
-  Package,
-  ShoppingCart,
-  UserCircle,
-  Menu,
-} from "lucide-react";
+import { ShoppingCart, Menu } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const { navigate, user, setUser, axios, cartCount } =
-    useContext(AppContext);
+  const { navigate, user, setUser, cartCount } = useContext(AppContext);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const logout = async () => {
-    try {
-      const { data } = await axios.post("/api/auth/logout");
-      if (data.success) {
-        setUser(null);
-        toast.success(data.message);
-        navigate("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    toast.success("Logged out successfully");
+    navigate("/");
   };
 
   return (
@@ -39,7 +24,7 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link to="/" onClick={() => setIsMenuOpen(false)}>
-            <img src="./logo.png" alt="logo" className="w-20" />
+            <img src="/logo.png" alt="logo" className="w-20" />
           </Link>
 
           {/* Desktop Menu */}
@@ -57,14 +42,14 @@ const Navbar = () => {
             <button onClick={() => navigate("/cart")} className="relative">
               <ShoppingCart />
               <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full px-1">
-                {cartCount}
+                {cartCount || 0}
               </span>
             </button>
 
             {/* Desktop Login/Profile */}
             <div className="hidden md:block">
               {user ? (
-                <button onClick={logout} className="text-red-600">
+                <button onClick={logout} className="text-red-600 font-medium">
                   Logout
                 </button>
               ) : (
@@ -104,7 +89,7 @@ const Navbar = () => {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="text-red-600"
+                className="text-red-600 font-medium"
               >
                 Logout
               </button>
