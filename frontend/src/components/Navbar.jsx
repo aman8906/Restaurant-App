@@ -5,15 +5,23 @@ import { ShoppingCart, Menu } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const { navigate, user, setUser, cartCount } = useContext(AppContext);
+  const { navigate, user, setUser, axios, cartCount } =
+    useContext(AppContext);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-    toast.success("Logged out successfully");
-    navigate("/");
+  const logout = async () => {
+    try {
+      const { data } = await axios.post("/api/auth/logout");
+
+      if (data.success) {
+        setUser(null);
+        toast.success(data.message);
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -42,14 +50,14 @@ const Navbar = () => {
             <button onClick={() => navigate("/cart")} className="relative">
               <ShoppingCart />
               <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full px-1">
-                {cartCount || 0}
+                {cartCount}
               </span>
             </button>
 
             {/* Desktop Login/Profile */}
             <div className="hidden md:block">
               {user ? (
-                <button onClick={logout} className="text-red-600 font-medium">
+                <button onClick={logout} className="text-red-600">
                   Logout
                 </button>
               ) : (
@@ -89,7 +97,7 @@ const Navbar = () => {
                   setIsMenuOpen(false);
                   logout();
                 }}
-                className="text-red-600 font-medium"
+                className="text-red-600"
               >
                 Logout
               </button>
