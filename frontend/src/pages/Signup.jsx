@@ -30,7 +30,12 @@ const handleSubmit = async (e) => {
 
     if (data.success) {
       toast.success(data.message);
-      navigate("/login"); // ✅ correct flow
+
+      // ✅ Auto login after register
+      await isAuth();
+
+      // ✅ Redirect to home
+      navigate("/");
     } else {
       toast.error(data.message);
     }
@@ -40,6 +45,7 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
 
   return (
