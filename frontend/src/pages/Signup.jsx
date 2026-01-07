@@ -16,7 +16,6 @@ const Signup = () => {
   const onChangeHandler = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
@@ -31,7 +30,7 @@ const handleSubmit = async (e) => {
     if (data.success) {
       toast.success(data.message);
 
-      // ✅ Auto login after register
+      // ✅ Immediately refresh auth state
       await isAuth();
 
       // ✅ Redirect to home
@@ -45,6 +44,7 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
 
 
